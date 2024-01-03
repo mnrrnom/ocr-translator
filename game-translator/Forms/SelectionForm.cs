@@ -1,4 +1,5 @@
 ﻿using game_translator.Events;
+using game_translator.Utils;
 using Tesseract;
 using Timer = System.Windows.Forms.Timer;
 
@@ -6,15 +7,16 @@ namespace game_translator.Forms;
 
 public partial class SelectionForm : Form
 {
+    private readonly OcrService _ocrService;
     private static Point? _startPoint;
     private static Rectangle? _rectangle;
     private static readonly Timer _timer = new();
-    private static readonly TesseractEngine _tessEngine = new("./tessdata", "Japanese", EngineMode.Default);
     private readonly Pen _pen = new(Color.Red, 2);
     public event EventHandler<DisplayOutputEvent>? OnDisplayOutput;
     
-    public SelectionForm()
+    public SelectionForm(OcrService ocrService)
     {
+        _ocrService = ocrService;
         InitializeComponent();
         FormBorderStyle = FormBorderStyle.None;
         WindowState = FormWindowState.Maximized;
@@ -22,23 +24,31 @@ public partial class SelectionForm : Form
         SetStyle(ControlStyles.UserPaint, true);
         SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
         SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-        Opacity = 0.3;
+        Opacity = 0;
         
         _timer.Interval = 1000 / 60;
         _timer.Tick += (_, _) => Invalidate();
         _timer.Start();
     }
-    
-    public void CleanUp()
+
+    public void StartSelection()
     {
-        _timer.Stop();
-        _tessEngine.Dispose();
-        _pen.Dispose();
+        TopMost = true;
+        Opacity = 0.3;
+    } 
+    
+    public void StopSelection()
+    {
+        TopMost = false;
+        Opacity = 0;
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
         _timer.Stop();
+        _pen.Dispose();
+        _timer.Dispose();
+        
         base.OnFormClosing(e);
     }
     
@@ -77,7 +87,9 @@ public partial class SelectionForm : Form
         if (e.Button == MouseButtons.Left)
         {
             _startPoint = null;
+            StopSelection();
             SaveScreenInRectangle();
+            _rectangle = null;
         }
 
         base.OnMouseUp(e);
@@ -86,21 +98,9 @@ public partial class SelectionForm : Form
     private void SaveScreenInRectangle()
     {
         if (_rectangle == null) return;
-        var rectangle = _rectangle.Value;
-
-        using var bitmap = new Bitmap(rectangle.Width, rectangle.Height);
-        using var g = Graphics.FromImage(bitmap);
-        g.CopyFromScreen(rectangle.Location, Point.Empty, rectangle.Size);
-
-        using var pix = PixConverter.ToPix(bitmap);
-        using var page = _tessEngine.Process(pix);
-        var text = page?.GetText()
-            .Replace(" ", "")
-            .Replace('\n', ' ')
-            .Replace('\r', ' ')
-            .Trim(' ', '\n', '\r');
-        if (text?.Length <= 0) return;
-        Clipboard.SetText(text ?? string.Empty);
+        var text = _ocrService.GetTextFromScreenInBound(_rectangle.Value);
+        if (string.IsNullOrEmpty(text)) return;
+        Clipboard.SetText(text);
         OnDisplayOutputEvent(new(text));
     }
     

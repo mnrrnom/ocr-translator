@@ -15,7 +15,7 @@ public class KeyboardHookHandler
         _hook.Dispose();
     }
 
-    public void Activate()
+    public async Task ActivateAsync()
     {
         _hook.KeyPressed += (_, args) =>
         {
@@ -33,6 +33,6 @@ public class KeyboardHookHandler
             }
         };
         
-        _hook.Run();
+        await _hook.RunAsync();
     }
 }

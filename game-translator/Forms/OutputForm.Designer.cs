@@ -44,6 +44,7 @@ partial class OutputForm
         rtbOutput.Size = new Size(684, 266);
         rtbOutput.TabIndex = 0;
         rtbOutput.Text = "Translation result";
+        rtbOutput.ReadOnly = true;
         // 
         // rtbRomaji
         // 
@@ -54,6 +55,7 @@ partial class OutputForm
         rtbRomaji.Size = new Size(684, 227);
         rtbRomaji.TabIndex = 1;
         rtbRomaji.Text = "Selected text preview";
+        rtbRomaji.ReadOnly = true;
         // 
         // btnSettings
         // 
