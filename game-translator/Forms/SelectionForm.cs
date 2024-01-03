@@ -18,28 +18,27 @@ public partial class SelectionForm : Form
         InitializeComponent();
         FormBorderStyle = FormBorderStyle.None;
         WindowState = FormWindowState.Maximized;
-        Opacity = 0;
         KeyPreview = true;
-        TopMost = true;
         SetStyle(ControlStyles.UserPaint, true);
         SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
         SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+        Opacity = 0.3;
         
         _timer.Interval = 1000 / 60;
         _timer.Tick += (_, _) => Invalidate();
         _timer.Start();
     }
-
-    public void ShowOverlay()
-    {
-        Opacity = 0.3;
-        TopMost = true;
-    }
     
-    protected override void OnFormClosing(FormClosingEventArgs e)
+    public void CleanUp()
     {
         _timer.Stop();
         _tessEngine.Dispose();
+        _pen.Dispose();
+    }
+
+    protected override void OnFormClosing(FormClosingEventArgs e)
+    {
+        _timer.Stop();
         base.OnFormClosing(e);
     }
     
@@ -78,7 +77,6 @@ public partial class SelectionForm : Form
         if (e.Button == MouseButtons.Left)
         {
             _startPoint = null;
-            Opacity = 0;
             SaveScreenInRectangle();
         }
 

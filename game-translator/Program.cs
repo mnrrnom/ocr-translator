@@ -1,4 +1,3 @@
-using System.Text;
 using game_translator.Forms;
 using game_translator.Utils;
 
@@ -9,8 +8,11 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
-        ConfigurationManager.CreateConfiguration();
+        AppConfigurationManager.EnsureConfigurationCreated();
         ApplicationConfiguration.Initialize();
-        Application.Run(new OutputForm());
+        
+        
+        
+        Application.Run();
     }
 }

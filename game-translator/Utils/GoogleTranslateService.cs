@@ -10,9 +10,9 @@ public class GoogleTranslateService : IDisposable
     private readonly HttpClient _romajiClient;
     
     private const string _romanizeUrl = "https://translation.googleapis.com/v3/projects/game-ocr-410008/locations/us-central1:romanizeText";
-    private readonly string _translateUrl = $"https://translation.googleapis.com/language/translate/v2?key={ConfigurationManager.GetConfiguration()?.GoogleTranslateApiKey}";
+    private readonly string _translateUrl = $"https://translation.googleapis.com/language/translate/v2?key={AppConfigurationManager.GetConfiguration()?.GoogleTranslateApiKey}";
     
-    private readonly string? _token = ConfigurationManager.GetConfiguration()?.GoogleTranslateToken;
+    private readonly string? _token = AppConfigurationManager.GetConfiguration()?.GoogleTranslateToken;
 
     public GoogleTranslateService()
     {
