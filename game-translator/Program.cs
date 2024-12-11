@@ -10,7 +10,7 @@ internal static class Program
     private static void Main()
     {
         AppConfigurationManager.EnsureConfigurationCreated();
-        _updateGoogleBearerToken();
+        // _updateGoogleBearerToken();
         ApplicationConfiguration.Initialize();
         
         var keyboardHookHandler = new KeyboardHookHandler();
